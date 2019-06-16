@@ -307,30 +307,31 @@ class InstaloaderContext:
         :param query_hash: The query_hash parameter of the query.
         :param untracked_queries: True, if 429 has been returned to apply 429 logic.
         """
-        if not untracked_queries:
-            waittime = self._graphql_query_waittime(query_hash, time.monotonic(), untracked_queries)
-            assert waittime >= 0
-            if waittime > 10:
-                self.log('\nToo many queries in the last time. Need to wait {} seconds, until {:%H:%M}.'
-                         .format(waittime, datetime.now() + timedelta(seconds=waittime)))
-            time.sleep(waittime)
-            if query_hash not in self._graphql_query_timestamps:
-                self._graphql_query_timestamps[query_hash] = [time.monotonic()]
-            else:
-                self._graphql_query_timestamps[query_hash].append(time.monotonic())
-        else:
-            text_for_429 = ("HTTP error code 429 was returned because too many queries occured in the last time. "
-                            "Please do not use Instagram in your browser or run multiple instances of Instaloader "
-                            "in parallel.")
-            print(textwrap.fill(text_for_429), file=sys.stderr)
-            current_time = time.monotonic()
-            waittime = self._graphql_query_waittime(query_hash, current_time, untracked_queries)
-            assert waittime >= 0
-            if waittime > 10:
-                self.log('The request will be retried in {} seconds, at {:%H:%M}.'
-                         .format(waittime, datetime.now() + timedelta(seconds=waittime)))
-            self._dump_query_timestamps(current_time)
-            time.sleep(waittime)
+        pass
+        # if not untracked_queries:
+        #     waittime = self._graphql_query_waittime(query_hash, time.monotonic(), untracked_queries)
+        #     assert waittime >= 0
+        #     if waittime > 10:
+        #         self.log('\nToo many queries in the last time. Need to wait {} seconds, until {:%H:%M}.'
+        #                  .format(waittime, datetime.now() + timedelta(seconds=waittime)))
+        #     time.sleep(waittime)
+        #     if query_hash not in self._graphql_query_timestamps:
+        #         self._graphql_query_timestamps[query_hash] = [time.monotonic()]
+        #     else:
+        #         self._graphql_query_timestamps[query_hash].append(time.monotonic())
+        # else:
+        #     text_for_429 = ("HTTP error code 429 was returned because too many queries occured in the last time. "
+        #                     "Please do not use Instagram in your browser or run multiple instances of Instaloader "
+        #                     "in parallel.")
+        #     print(textwrap.fill(text_for_429), file=sys.stderr)
+        #     current_time = time.monotonic()
+        #     waittime = self._graphql_query_waittime(query_hash, current_time, untracked_queries)
+        #     assert waittime >= 0
+        #     if waittime > 10:
+        #         self.log('The request will be retried in {} seconds, at {:%H:%M}.'
+        #                  .format(waittime, datetime.now() + timedelta(seconds=waittime)))
+        #     self._dump_query_timestamps(current_time)
+        #     time.sleep(waittime)
 
     def get_json(self, path: str, params: Dict[str, Any], host: str = 'www.instagram.com',
                  session: Optional[requests.Session] = None, _attempt=1) -> Dict[str, Any]:
