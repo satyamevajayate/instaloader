@@ -735,6 +735,20 @@ class Profile:
                                                     lambda d: d['data']['user']['edge_followed_by'],
                                                     self._rhx_gis))
 
+    def get_followers_one_time(self, expected_nodes_count=None) -> List['Profile']:
+        """
+        Retrieve list of followers of given profile.
+        To use this, one needs to be logged in and private profiles has to be followed.
+        """
+        if not self._context.is_logged_in:
+            raise LoginRequiredException("--login required to get a profile's followers.")
+        self._obtain_metadata()
+        return [Profile(self._context, node) for node in self._context.graphql_node_list("37479f2b8209594dde7facb0d904896a",
+                                                    {'id': str(self.userid)},
+                                                    'https://www.instagram.com/' + self.username + '/',
+                                                    lambda d: d['data']['user']['edge_followed_by'],
+                                                    self._rhx_gis, expected_nodes_count=expected_nodes_count)]
+
     def get_followees(self) -> Iterator['Profile']:
         """
         Retrieve list of followees (followings) of given profile.
@@ -749,6 +763,22 @@ class Profile:
                                                     'https://www.instagram.com/' + self.username + '/',
                                                     lambda d: d['data']['user']['edge_follow'],
                                                     self._rhx_gis))
+
+    def get_followees_one_time(self, expected_nodes_count=None) -> List['Profile']:
+        """
+        Retrieve list of followees (followings) of given profile.
+        To use this, one needs to be logged in and private profiles has to be followed.
+        """
+        if not self._context.is_logged_in:
+            raise LoginRequiredException("--login required to get a profile's followees.")
+        self._obtain_metadata()
+        return [Profile(self._context, node) for node in
+                    self._context.graphql_node_list("58712303d941c6855d4e888c5f0cd22f",
+                                                    {'id': str(self.userid)},
+                                                    'https://www.instagram.com/' + self.username + '/',
+                                                    lambda d: d['data']['user']['edge_follow'],
+                                                    self._rhx_gis, expected_nodes_count=expected_nodes_count)]
+
 
 
 class StoryItem:

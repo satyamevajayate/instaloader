@@ -430,7 +430,6 @@ class InstaloaderContext:
                 values = "{}:{}".format(rhx_gis, variables_json)
                 x_instagram_gis = hashlib.md5(values.encode()).hexdigest()
                 tmpsession.headers['x-instagram-gis'] = x_instagram_gis
-
             resp_json = self.get_json('graphql/query',
                                       params={'query_hash': query_hash,
                                               'variables': variables_json},
@@ -443,11 +442,12 @@ class InstaloaderContext:
                           query_referer: Optional[str],
                           edge_extractor: Callable[[Dict[str, Any]], Dict[str, Any]],
                           rhx_gis: Optional[str] = None,
-                          first_data: Optional[Dict[str, Any]] = None) -> Iterator[Dict[str, Any]]:
+                          first_data: Optional[Dict[str, Any]] = None,
+                          expected_nodes_count: Optional[int] = None) -> Iterator[Dict[str, Any]]:
         """Retrieve a list of GraphQL nodes."""
 
         def _query():
-            query_variables['first'] = self._graphql_page_length
+            query_variables['first'] = expected_nodes_count if expected_nodes_count else self._graphql_page_length
             try:
                 return edge_extractor(self.graphql_query(query_hash, query_variables, query_referer, rhx_gis))
             except QueryReturnedBadRequestException:
@@ -460,15 +460,20 @@ class InstaloaderContext:
                 else:
                     raise
 
+        page = 0
         if first_data:
             data = first_data
         else:
             data = _query()
         yield from (edge['node'] for edge in data['edges'])
         while data['page_info']['has_next_page']:
-            query_variables['after'] = data['page_info']['end_cursor']
-            data = _query()
-            yield from (edge['node'] for edge in data['edges'])
+            if (expected_nodes_count is None or (expected_nodes_count >= (page * self._graphql_page_length))):
+                query_variables['after'] = data['page_info']['end_cursor']
+                data = _query()
+                page += 1
+                yield from (edge['node'] for edge in data['edges'])
+            else:
+                break
 
     def get_iphone_json(self, path: str, params: Dict[str, Any]) -> Dict[str, Any]:
         """JSON request to ``i.instagram.com``.
