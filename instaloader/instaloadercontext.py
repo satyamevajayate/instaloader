@@ -449,6 +449,7 @@ class InstaloaderContext:
         def _query():
             query_variables['first'] = expected_nodes_count if expected_nodes_count else self._graphql_page_length
             try:
+                time.sleep(1)
                 return edge_extractor(self.graphql_query(query_hash, query_variables, query_referer, rhx_gis))
             except QueryReturnedBadRequestException:
                 new_page_length = int(self._graphql_page_length / 2)
