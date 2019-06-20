@@ -735,7 +735,7 @@ class Profile:
                                                     lambda d: d['data']['user']['edge_followed_by'],
                                                     self._rhx_gis))
 
-    def get_followers_one_time(self, expected_nodes_count=None) -> List['Profile']:
+    def get_followers_one_time(self, expected_nodes_count=None, min_sleep=0.25, max_sleep=0.5) -> List['Profile']:
         """
         Retrieve list of followers of given profile.
         To use this, one needs to be logged in and private profiles has to be followed.
@@ -747,7 +747,8 @@ class Profile:
                                                     {'id': str(self.userid)},
                                                     'https://www.instagram.com/' + self.username + '/',
                                                     lambda d: d['data']['user']['edge_followed_by'],
-                                                    self._rhx_gis, expected_nodes_count=expected_nodes_count)]
+                                                    self._rhx_gis, expected_nodes_count=expected_nodes_count,
+                                                    min_sleep=min_sleep, max_sleep=max_sleep)]
 
     def get_followees(self) -> Iterator['Profile']:
         """
@@ -764,7 +765,7 @@ class Profile:
                                                     lambda d: d['data']['user']['edge_follow'],
                                                     self._rhx_gis))
 
-    def get_followees_one_time(self, expected_nodes_count=None) -> List['Profile']:
+    def get_followees_one_time(self, expected_nodes_count=None, min_sleep=0.25, max_sleep=0.5) -> List['Profile']:
         """
         Retrieve list of followees (followings) of given profile.
         To use this, one needs to be logged in and private profiles has to be followed.
@@ -777,7 +778,8 @@ class Profile:
                                                     {'id': str(self.userid)},
                                                     'https://www.instagram.com/' + self.username + '/',
                                                     lambda d: d['data']['user']['edge_follow'],
-                                                    self._rhx_gis, expected_nodes_count=expected_nodes_count)]
+                                                    self._rhx_gis, expected_nodes_count=expected_nodes_count,
+                                                    min_sleep=min_sleep, max_sleep=max_sleep)]
 
 
 

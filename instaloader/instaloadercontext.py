@@ -443,13 +443,16 @@ class InstaloaderContext:
                           edge_extractor: Callable[[Dict[str, Any]], Dict[str, Any]],
                           rhx_gis: Optional[str] = None,
                           first_data: Optional[Dict[str, Any]] = None,
-                          expected_nodes_count: Optional[int] = None) -> Iterator[Dict[str, Any]]:
+                          expected_nodes_count: Optional[int] = None,
+                          min_sleep: Optional[float] = None,
+                          max_sleep: Optional[float] = None) -> Iterator[Dict[str, Any]]:
         """Retrieve a list of GraphQL nodes."""
 
         def _query():
             query_variables['first'] = expected_nodes_count if expected_nodes_count else self._graphql_page_length
             try:
-                time.sleep(1)
+                if min_sleep is not None and max_sleep is not None:
+                    time.sleep(random.uniform(min_sleep, max_sleep))
                 return edge_extractor(self.graphql_query(query_hash, query_variables, query_referer, rhx_gis))
             except QueryReturnedBadRequestException:
                 new_page_length = int(self._graphql_page_length / 2)
